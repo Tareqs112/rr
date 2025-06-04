@@ -1,0 +1,9 @@
+require('dotenv').config();
+
+module.exports = {
+  TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID || 'AC00000000000000000000000000000000',
+  TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN || '0000000000000000000000000000000000',
+  TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER || '+10000000000',
+  WHATSAPP_ENABLED: process.env.WHATSAPP_ENABLED === 'true' || false,
+  SMS_ENABLED: process.env.SMS_ENABLED === 'true' || true
+};
