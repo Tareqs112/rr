@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     id: {
@@ -47,6 +49,17 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'users',
     timestamps: true
+  });
+
+  // 🧠 دالة لمقارنة كلمة المرور
+  User.prototype.validatePassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+  };
+
+  // 🔐 تشفير كلمة المرور قبل إنشاء المستخدم
+  User.beforeCreate(async (user, options) => {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
   });
 
   return User;

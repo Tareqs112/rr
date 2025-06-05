@@ -1,21 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Typography, Paper, TextField, Button, Alert } from '@mui/material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, clearError } from '../../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state) => state.auth);
+  const { isLoading, error, isAuthenticated, token } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Clear any previous errors
     dispatch(clearError());
   }, [dispatch]);
+
+  // ✅ توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      localStorage.setItem('token', token); // حفظ التوكن في التخزين المحلي
+      navigate('/dashboard'); // غيّر إلى المسار المطلوب بعد تسجيل الدخول
+    }
+  }, [isAuthenticated, token, navigate]);
 
   const formik = useFormik({
     initialValues: {
@@ -23,11 +29,8 @@ const Login = () => {
       password: ''
     },
     validationSchema: Yup.object({
-      email: Yup.string()
-        .email('Invalid email address')
-        .required('Email is required'),
-      password: Yup.string()
-        .required('Password is required')
+      email: Yup.string().email('Invalid email').required('Required'),
+      password: Yup.string().required('Required')
     }),
     onSubmit: (values) => {
       dispatch(login(values));
@@ -35,36 +38,12 @@ const Login = () => {
   });
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        bgcolor: 'background.default'
-      }}
-    >
-      <Paper
-        elevation={3}
-        sx={{
-          p: 4,
-          width: '100%',
-          maxWidth: 400,
-          borderRadius: 2
-        }}
-      >
-        <Typography variant="h4" align="center" gutterBottom>
-          Car Rental System
-        </Typography>
-        <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
-          Login to your account
-        </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Paper sx={{ p: 4, width: '100%', maxWidth: 400 }}>
+        <Typography variant="h4" align="center">Car Rental System</Typography>
+        <Typography variant="subtitle1" align="center" color="textSecondary">Login to your account</Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
 
         <form onSubmit={formik.handleSubmit}>
           <TextField
@@ -100,7 +79,7 @@ const Login = () => {
             variant="contained"
             color="primary"
             size="large"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3 }}
             disabled={isLoading}
           >
             {isLoading ? 'Logging in...' : 'Login'}

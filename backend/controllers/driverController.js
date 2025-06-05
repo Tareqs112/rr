@@ -1,257 +1,230 @@
-const Driver = require('../models/Driver');
-const Booking = require('../models/Booking');
+const db = require('../models');
+const Driver = db.Driver;
+const Booking = db.Booking;
 const { Op } = require('sequelize');
 
 // Get all drivers
-const getAllDrivers = async (req, res) => {
+exports.getAllDrivers = async (req, res) => {
   try {
     const drivers = await Driver.findAll({
-      order: [['name', 'ASC']]
+      where: {
+        tenant_id: req.tenantId
+      }
     });
-    res.status(200).json({ drivers });
+    
+    return res.status(200).json({
+      success: true,
+      data: drivers
+    });
   } catch (error) {
-    console.error('Get all drivers error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching drivers:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch drivers',
+      error: error.message
+    });
   }
 };
 
 // Get driver by ID
-const getDriverById = async (req, res) => {
+exports.getDriverById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const driver = await Driver.findByPk(id);
+    const driver = await Driver.findOne({
+      where: {
+        id: req.params.id,
+        tenant_id: req.tenantId
+      }
+    });
     
     if (!driver) {
-      return res.status(404).json({ message: 'Driver not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Driver not found'
+      });
     }
     
-    res.status(200).json({ driver });
+    return res.status(200).json({
+      success: true,
+      data: driver
+    });
   } catch (error) {
-    console.error('Get driver by ID error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching driver:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch driver',
+      error: error.message
+    });
   }
 };
 
 // Create new driver
-const createDriver = async (req, res) => {
+exports.createDriver = async (req, res) => {
   try {
-    const { name, phone, license_number, languages, status } = req.body;
+    // Add tenant ID to driver data
+    const driverData = {
+      ...req.body,
+      tenant_id: req.tenantId
+    };
     
-    // Check if license number is already in use
-    const existingDriver = await Driver.findOne({ where: { license_number } });
+    const driver = await Driver.create(driverData);
     
-    if (existingDriver) {
-      return res.status(409).json({ message: 'License number already in use' });
-    }
-    
-    const driver = await Driver.create({
-      name,
-      phone,
-      license_number,
-      languages,
-      status: status || 'available'
-    });
-    
-    res.status(201).json({
-      message: 'Driver created successfully',
-      driver
+    return res.status(201).json({
+      success: true,
+      data: driver,
+      message: 'Driver created successfully'
     });
   } catch (error) {
-    console.error('Create driver error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error creating driver:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to create driver',
+      error: error.message
+    });
   }
 };
 
 // Update driver
-const updateDriver = async (req, res) => {
+exports.updateDriver = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, phone, license_number, languages, status } = req.body;
-    
-    const driver = await Driver.findByPk(id);
+    const driver = await Driver.findOne({
+      where: {
+        id: req.params.id,
+        tenant_id: req.tenantId
+      }
+    });
     
     if (!driver) {
-      return res.status(404).json({ message: 'Driver not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Driver not found'
+      });
     }
     
-    // Check if license number is already in use by another driver
-    if (license_number && license_number !== driver.license_number) {
-      const existingDriver = await Driver.findOne({ where: { license_number } });
-      
-      if (existingDriver) {
-        return res.status(409).json({ message: 'License number already in use' });
-      }
-    }
+    await driver.update(req.body);
     
-    await driver.update({
-      name: name || driver.name,
-      phone: phone || driver.phone,
-      license_number: license_number || driver.license_number,
-      languages: languages || driver.languages,
-      status: status || driver.status
-    });
-    
-    res.status(200).json({
-      message: 'Driver updated successfully',
-      driver
+    return res.status(200).json({
+      success: true,
+      data: driver,
+      message: 'Driver updated successfully'
     });
   } catch (error) {
-    console.error('Update driver error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error updating driver:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to update driver',
+      error: error.message
+    });
   }
 };
 
 // Delete driver
-const deleteDriver = async (req, res) => {
+exports.deleteDriver = async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    const driver = await Driver.findByPk(id);
+    const driver = await Driver.findOne({
+      where: {
+        id: req.params.id,
+        tenant_id: req.tenantId
+      }
+    });
     
     if (!driver) {
-      return res.status(404).json({ message: 'Driver not found' });
-    }
-    
-    // Check if driver has bookings
-    const bookings = await Booking.findOne({ where: { driver_id: id } });
-    
-    if (bookings) {
-      return res.status(400).json({ 
-        message: 'Cannot delete driver with existing bookings' 
+      return res.status(404).json({
+        success: false,
+        message: 'Driver not found'
       });
     }
     
     await driver.destroy();
     
-    res.status(200).json({ message: 'Driver deleted successfully' });
+    return res.status(200).json({
+      success: true,
+      message: 'Driver deleted successfully'
+    });
   } catch (error) {
-    console.error('Delete driver error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error deleting driver:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to delete driver',
+      error: error.message
+    });
   }
 };
 
 // Get available drivers
-const getAvailableDrivers = async (req, res) => {
+exports.getAvailableDrivers = async (req, res) => {
   try {
-    const { start_date, start_time, end_date, end_time } = req.query;
+    const { start_date, end_date } = req.query;
     
-    // If no dates provided, just return drivers with 'available' status
-    if (!start_date || !end_date) {
-      const availableDrivers = await Driver.findAll({
-        where: { status: 'available' },
-        order: [['name', 'ASC']]
-      });
-      
-      return res.status(200).json({ drivers: availableDrivers });
-    }
-    
-    // Get all drivers with 'available' status
-    const availableDrivers = await Driver.findAll({
-      where: { status: 'available' }
-    });
-    
-    // Get all bookings that overlap with the requested period
-    const bookings = await Booking.findAll({
+    // Find drivers who don't have bookings in the specified time range
+    const busyDriverIds = await Booking.findAll({
+      attributes: ['driver_id'],
       where: {
-        driver_id: {
-          [Op.in]: availableDrivers.map(driver => driver.id)
-        },
+        tenant_id: req.tenantId,
+        driver_id: { [Op.ne]: null },
         [Op.or]: [
           {
-            // Booking starts during the requested period
-            [Op.and]: [
-              { pickup_date: { [Op.gte]: start_date } },
-              { pickup_date: { [Op.lte]: end_date } }
-            ]
+            start_date: {
+              [Op.between]: [start_date, end_date]
+            }
           },
           {
-            // Booking ends during the requested period
-            [Op.and]: [
-              { return_date: { [Op.gte]: start_date } },
-              { return_date: { [Op.lte]: end_date } }
-            ]
+            end_date: {
+              [Op.between]: [start_date, end_date]
+            }
           },
           {
-            // Booking spans the entire requested period
             [Op.and]: [
-              { pickup_date: { [Op.lte]: start_date } },
-              { return_date: { [Op.gte]: end_date } }
+              { start_date: { [Op.lte]: start_date } },
+              { end_date: { [Op.gte]: end_date } }
             ]
           }
         ]
+      },
+      raw: true
+    }).then(bookings => bookings.map(booking => booking.driver_id));
+    
+    const availableDrivers = await Driver.findAll({
+      where: {
+        tenant_id: req.tenantId,
+        id: { [Op.notIn]: busyDriverIds },
+        status: 'active'
       }
     });
     
-    // Create a set of booked driver IDs
-    const bookedDriverIds = new Set(bookings.map(booking => booking.driver_id));
-    
-    // Filter out booked drivers
-    const availableDriversList = availableDrivers.filter(driver => !bookedDriverIds.has(driver.id));
-    
-    res.status(200).json({ drivers: availableDriversList });
+    return res.status(200).json({
+      success: true,
+      data: availableDrivers
+    });
   } catch (error) {
-    console.error('Get available drivers error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching available drivers:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch available drivers',
+      error: error.message
+    });
   }
 };
 
 // Get driver bookings
-const getDriverBookings = async (req, res) => {
+exports.getDriverBookings = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { start_date, end_date } = req.query;
-    
-    const driver = await Driver.findByPk(id);
-    
-    if (!driver) {
-      return res.status(404).json({ message: 'Driver not found' });
-    }
-    
-    // Build query conditions
-    const whereClause = { driver_id: id };
-    
-    if (start_date && end_date) {
-      whereClause[Op.or] = [
-        {
-          // Booking starts during the requested period
-          pickup_date: {
-            [Op.between]: [start_date, end_date]
-          }
-        },
-        {
-          // Booking ends during the requested period
-          return_date: {
-            [Op.between]: [start_date, end_date]
-          }
-        },
-        {
-          // Booking spans the entire requested period
-          [Op.and]: [
-            { pickup_date: { [Op.lte]: start_date } },
-            { return_date: { [Op.gte]: end_date } }
-          ]
-        }
-      ];
-    }
-    
     const bookings = await Booking.findAll({
-      where: whereClause,
-      order: [['pickup_date', 'ASC'], ['pickup_time', 'ASC']]
+      where: {
+        driver_id: req.params.id,
+        tenant_id: req.tenantId
+      }
     });
     
-    res.status(200).json({ bookings });
+    return res.status(200).json({
+      success: true,
+      data: bookings
+    });
   } catch (error) {
-    console.error('Get driver bookings error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching driver bookings:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch driver bookings',
+      error: error.message
+    });
   }
-};
-
-module.exports = {
-  getAllDrivers,
-  getDriverById,
-  createDriver,
-  updateDriver,
-  deleteDriver,
-  getAvailableDrivers,
-  getDriverBookings
 };

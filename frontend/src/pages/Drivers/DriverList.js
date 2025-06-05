@@ -19,7 +19,7 @@ const DriverList = () => {
     try {
       setLoading(true);
       const data = await getAllDrivers();
-      setDrivers(data);
+      setDrivers(Array.isArray(data) ? data : data.drivers || []);
       setError(null);
     } catch (err) {
       setError('فشل في تحميل بيانات السائقين');
@@ -37,25 +37,26 @@ const DriverList = () => {
   const filterDrivers = async () => {
     try {
       setLoading(true);
-      
+
       if (filterAvailable) {
         const data = await getAvailableDrivers();
-        setDrivers(data);
+        setDrivers(Array.isArray(data) ? data : data.drivers || []);
       } else {
         const data = await getAllDrivers();
-        
+        const driversArray = Array.isArray(data) ? data : data.drivers || [];
+
         if (searchTerm) {
-          const filtered = data.filter(driver => 
+          const filtered = driversArray.filter(driver =>
             driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             driver.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
             driver.phone.includes(searchTerm)
           );
           setDrivers(filtered);
         } else {
-          setDrivers(data);
+          setDrivers(driversArray);
         }
       }
-      
+
       setCurrentPage(1);
       setError(null);
     } catch (err) {
@@ -72,21 +73,14 @@ const DriverList = () => {
     fetchDrivers();
   };
 
-  // الحصول على السائقين الحاليين
   const indexOfLastDriver = currentPage * driversPerPage;
   const indexOfFirstDriver = indexOfLastDriver - driversPerPage;
   const currentDrivers = drivers.slice(indexOfFirstDriver, indexOfLastDriver);
 
-  // تغيير الصفحة
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  if (loading) {
-    return <div className="loading">جاري التحميل...</div>;
-  }
-
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+  if (loading) return <div className="loading">جاري التحميل...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div>
@@ -122,12 +116,8 @@ const DriverList = () => {
               السائقين المتاحين فقط
             </label>
           </div>
-          <button type="submit" className="btn btn-primary mr-2">
-            بحث
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={resetFilters}>
-            إعادة تعيين
-          </button>
+          <button type="submit" className="btn btn-primary mr-2">بحث</button>
+          <button type="button" className="btn btn-secondary" onClick={resetFilters}>إعادة تعيين</button>
         </form>
       </div>
 
@@ -162,12 +152,8 @@ const DriverList = () => {
                     </td>
                     <td>{new Date(driver.hireDate).toLocaleDateString('ar-SA')}</td>
                     <td>
-                      <Link to={`/drivers/${driver.id}`} className="btn btn-sm btn-primary mr-2">
-                        عرض
-                      </Link>
-                      <Link to={`/drivers/${driver.id}/edit`} className="btn btn-sm btn-secondary mr-2">
-                        تعديل
-                      </Link>
+                      <Link to={`/drivers/${driver.id}`} className="btn btn-sm btn-primary mr-2">عرض</Link>
+                      <Link to={`/drivers/${driver.id}/edit`} className="btn btn-sm btn-secondary mr-2">تعديل</Link>
                     </td>
                   </tr>
                 ))}
@@ -175,7 +161,6 @@ const DriverList = () => {
             </table>
           </div>
 
-          {/* ترقيم الصفحات */}
           {drivers.length > driversPerPage && (
             <div className="pagination">
               {Array.from({ length: Math.ceil(drivers.length / driversPerPage) }).map((_, index) => (

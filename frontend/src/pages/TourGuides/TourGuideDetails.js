@@ -24,7 +24,7 @@ const TourGuideDetails = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/tour-guides/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/tour-guides/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -32,7 +32,7 @@ const TourGuideDetails = () => {
       
       // جلب الحملات السياحية المرتبطة بالمرشد
       try {
-        const campaignsResponse = await axios.get(`${API_BASE_URL}/api/tour-campaigns?guide_id=${id}`, {
+        const campaignsResponse = await axios.get(`${API_BASE_URL}/tour-campaigns?guide_id=${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCampaigns(campaignsResponse.data);

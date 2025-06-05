@@ -23,7 +23,7 @@ const TourGuideList = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/tour-guides`, {
+      const response = await axios.get(`${API_BASE_URL}/tour-guides`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGuides(response.data);
@@ -40,7 +40,7 @@ const TourGuideList = () => {
     if (window.confirm('هل أنت متأكد من رغبتك في حذف هذا المرشد السياحي؟')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`${API_BASE_URL}/api/tour-guides/${id}`, {
+        await axios.delete(`${API_BASE_URL}/tour-guides/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchGuides();

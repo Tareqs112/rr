@@ -1,0 +1,152 @@
+.dashboard {
+  padding: 1rem;
+}
+
+.page-title {
+  margin-bottom: 2rem;
+  color: #2d3748;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.stats-container {
+  margin-bottom: 2rem;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  flex: 1;
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.stat-card.available {
+  border-top: 4px solid #38a169;
+}
+
+.stat-card.booked {
+  border-top: 4px solid #3182ce;
+}
+
+.stat-card.maintenance {
+  border-top: 4px solid #e53e3e;
+}
+
+.stat-card.active {
+  border-top: 4px solid #805ad5;
+}
+
+.stat-card.pickup {
+  border-top: 4px solid #dd6b20;
+}
+
+.stat-card.return {
+  border-top: 4px solid #319795;
+}
+
+.stat-card.payment {
+  border-top: 4px solid #d69e2e;
+}
+
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.dashboard-section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.dashboard-table-container {
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 0.75rem;
+  text-align: right;
+}
+
+.dashboard-table th {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.dashboard-table tr:nth-child(even) {
+  background-color: #f7fafc;
+}
+
+.dashboard-table tr:hover {
+  background-color: #edf2f7;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status.confirmed {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.status.pending {
+  background-color: #feebc8;
+  color: #744210;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.2rem;
+  color: #4a5568;
+}

@@ -6,6 +6,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
 import store from './redux/store';
+import { checkAuth } from './redux/slices/authSlice';
+
+// التحقق من حالة المصادقة عند بدء التطبيق
+if (localStorage.getItem('token')) {
+  store.dispatch(checkAuth());
+}
 
 // Create a theme
 const theme = createTheme({

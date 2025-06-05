@@ -1,18 +1,15 @@
 import api from './api';
-
-// تصدير مباشر للدوال المطلوبة
+// Export report functions
 export const generateBookingReport = async (params) => {
   const response = await api.get('/reports/bookings', { params });
   return response.data;
 };
 
-// تصدير مباشر للدالة getBookingReport المطلوبة
 export const getBookingReport = async (params) => {
   const response = await api.get('/reports/bookings', { params });
   return response.data;
 };
 
-// تصدير مباشر للدالة getRevenueReport المطلوبة
 export const getRevenueReport = async (params) => {
   const response = await api.get('/reports/revenue', { params });
   return response.data;
@@ -28,14 +25,21 @@ export const generateCustomerReport = async (params) => {
   return response.data;
 };
 
-// تصدير مباشر للدالة getReportSummary المطلوبة
-export const getReportSummary = async () => {
-  const response = await api.get('/reports/dashboard-summary');
+export const getReportSummary = async (startDate = null, endDate = null) => {
+  const params = {};
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+  
+  const response = await api.get('/reports/dashboard-summary', { params });
   return response.data;
 };
 
-export const generateDashboardSummary = async () => {
-  const response = await api.get('/reports/dashboard-summary');
+export const generateDashboardSummary = async (startDate = null, endDate = null) => {
+  const params = {};
+  if (startDate) params.startDate = startDate;
+  if (endDate) params.endDate = endDate;
+  
+  const response = await api.get('/reports/dashboard-summary', { params });
   return response.data;
 };
 
@@ -47,7 +51,7 @@ export const exportReport = async (reportType, params) => {
   return response.data;
 };
 
-// الاحتفاظ بالتصدير الافتراضي للتوافق مع الكود القديم
+// Default export for backward compatibility
 const reportService = {
   generateBookingReport,
   getBookingReport,

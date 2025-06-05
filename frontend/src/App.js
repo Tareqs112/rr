@@ -1,81 +1,84 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
+import { checkAuth } from './redux/slices/authSlice';
 
-// المكونات المشتركة
+// المكونات الرئيسية
 import Navbar from './components/layout/Navbar';
+import TopNavbar from './components/layout/TopNavbar';
 import Sidebar from './components/layout/Sidebar';
-import PrivateRoute from './components/layout/PrivateRoute';
+import PrivateRoute from './components/auth/PrivateRoute';
+import TokenRefresher from './components/auth/TokenRefresher';
+import ErrorPage from './components/errors/ErrorPage';
 
 // صفحات المصادقة
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 
-// صفحات لوحة التحكم
+// صفحات النظام
 import Dashboard from './pages/Dashboard/Dashboard';
-
-// صفحات العملاء
 import CustomerList from './pages/Customers/CustomerList';
 import CustomerForm from './pages/Customers/CustomerForm';
 import CustomerDetails from './pages/Customers/CustomerDetails';
-
-// صفحات المركبات
 import VehicleList from './pages/Vehicles/VehicleList';
 import VehicleForm from './pages/Vehicles/VehicleForm';
 import VehicleDetails from './pages/Vehicles/VehicleDetails';
-
-// صفحات السائقين
 import DriverList from './pages/Drivers/DriverList';
 import DriverForm from './pages/Drivers/DriverForm';
 import DriverDetails from './pages/Drivers/DriverDetails';
-
-// صفحات الحجوزات
 import BookingList from './pages/Bookings/BookingList';
 import BookingForm from './pages/Bookings/BookingForm';
 import BookingDetails from './pages/Bookings/BookingDetails';
 
 // صفحات التقارير
 import ReportDashboard from './pages/Reports/ReportDashboard';
-import RevenueReport from './pages/Reports/RevenueReport';
 import BookingReport from './pages/Reports/BookingReport';
+import RevenueReport from './pages/Reports/RevenueReport';
 
-// صفحات الحملات السياحية
+// صفحات السياحة
 import TourCampaignList from './pages/TourCampaigns/TourCampaignList';
 import TourCampaignForm from './pages/TourCampaigns/TourCampaignForm';
 import TourCampaignDetails from './pages/TourCampaigns/TourCampaignDetails';
-
-// صفحات المرشدين السياحيين
 import TourGuideList from './pages/TourGuides/TourGuideList';
 import TourGuideForm from './pages/TourGuides/TourGuideForm';
 import TourGuideDetails from './pages/TourGuides/TourGuideDetails';
 
-// صفحات العروض والخصومات
+// صفحات العروض والمدفوعات
 import PromotionList from './pages/Promotions/PromotionList';
 import PromotionForm from './pages/Promotions/PromotionForm';
 import PromotionDetails from './pages/Promotions/PromotionDetails';
-
-// صفحات الأقساط والمدفوعات
 import InstallmentList from './pages/Installments/InstallmentList';
 import InstallmentPlanForm from './pages/Installments/InstallmentPlanForm';
 import InstallmentDetails from './pages/Installments/InstallmentDetails';
 import DueInstallments from './pages/Installments/DueInstallments';
 import InstallmentSummary from './pages/Installments/InstallmentSummary';
 
-// نمط التطبيق
 import './App.css';
 
 function App() {
+  const dispatch = useDispatch();
+
+  // التحقق من حالة المصادقة عند تحميل التطبيق
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
   return (
-    <div className="app-container">
+    <div className="app">
+      <TokenRefresher />
       <Routes>
+        {/* مسارات المصادقة */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/error" element={<ErrorPage />} />
         
+        {/* الصفحة الرئيسية / لوحة التحكم */}
         <Route path="/" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -88,7 +91,7 @@ function App() {
         {/* مسارات العملاء */}
         <Route path="/customers" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -99,7 +102,7 @@ function App() {
         } />
         <Route path="/customers/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -110,7 +113,7 @@ function App() {
         } />
         <Route path="/customers/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -121,7 +124,7 @@ function App() {
         } />
         <Route path="/customers/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -134,7 +137,7 @@ function App() {
         {/* مسارات المركبات */}
         <Route path="/vehicles" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -145,7 +148,7 @@ function App() {
         } />
         <Route path="/vehicles/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -156,7 +159,7 @@ function App() {
         } />
         <Route path="/vehicles/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -167,7 +170,7 @@ function App() {
         } />
         <Route path="/vehicles/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -180,7 +183,7 @@ function App() {
         {/* مسارات السائقين */}
         <Route path="/drivers" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -191,7 +194,7 @@ function App() {
         } />
         <Route path="/drivers/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -202,7 +205,7 @@ function App() {
         } />
         <Route path="/drivers/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -213,7 +216,7 @@ function App() {
         } />
         <Route path="/drivers/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -226,7 +229,7 @@ function App() {
         {/* مسارات الحجوزات */}
         <Route path="/bookings" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -237,7 +240,7 @@ function App() {
         } />
         <Route path="/bookings/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -248,7 +251,7 @@ function App() {
         } />
         <Route path="/bookings/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -259,7 +262,7 @@ function App() {
         } />
         <Route path="/bookings/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -272,7 +275,7 @@ function App() {
         {/* مسارات التقارير */}
         <Route path="/reports" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -281,20 +284,9 @@ function App() {
             </div>
           </PrivateRoute>
         } />
-        <Route path="/reports/revenue" element={
-          <PrivateRoute>
-            <Navbar />
-            <div className="content-container">
-              <Sidebar />
-              <Container fluid className="main-content">
-                <RevenueReport />
-              </Container>
-            </div>
-          </PrivateRoute>
-        } />
         <Route path="/reports/bookings" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -303,11 +295,22 @@ function App() {
             </div>
           </PrivateRoute>
         } />
+        <Route path="/reports/revenue" element={
+          <PrivateRoute>
+            <TopNavbar />
+            <div className="content-container">
+              <Sidebar />
+              <Container fluid className="main-content">
+                <RevenueReport />
+              </Container>
+            </div>
+          </PrivateRoute>
+        } />
         
         {/* مسارات الحملات السياحية */}
         <Route path="/tour-campaigns" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -318,7 +321,7 @@ function App() {
         } />
         <Route path="/tour-campaigns/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -329,7 +332,7 @@ function App() {
         } />
         <Route path="/tour-campaigns/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -340,7 +343,7 @@ function App() {
         } />
         <Route path="/tour-campaigns/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -353,7 +356,7 @@ function App() {
         {/* مسارات المرشدين السياحيين */}
         <Route path="/tour-guides" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -364,7 +367,7 @@ function App() {
         } />
         <Route path="/tour-guides/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -375,7 +378,7 @@ function App() {
         } />
         <Route path="/tour-guides/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -386,7 +389,7 @@ function App() {
         } />
         <Route path="/tour-guides/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -399,7 +402,7 @@ function App() {
         {/* مسارات العروض والخصومات */}
         <Route path="/promotions" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -410,7 +413,7 @@ function App() {
         } />
         <Route path="/promotions/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -421,7 +424,7 @@ function App() {
         } />
         <Route path="/promotions/edit/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -432,7 +435,7 @@ function App() {
         } />
         <Route path="/promotions/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -445,7 +448,7 @@ function App() {
         {/* مسارات الأقساط والمدفوعات */}
         <Route path="/installments" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -456,7 +459,7 @@ function App() {
         } />
         <Route path="/installments/plan/new" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -467,7 +470,7 @@ function App() {
         } />
         <Route path="/installments/:id" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -478,7 +481,7 @@ function App() {
         } />
         <Route path="/installments/due" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -489,7 +492,7 @@ function App() {
         } />
         <Route path="/installments/summary" element={
           <PrivateRoute>
-            <Navbar />
+            <TopNavbar />
             <div className="content-container">
               <Sidebar />
               <Container fluid className="main-content">
@@ -498,6 +501,9 @@ function App() {
             </div>
           </PrivateRoute>
         } />
+        
+        {/* مسار للصفحات غير الموجودة */}
+        <Route path="*" element={<Navigate to="/error?type=not_found" />} />
       </Routes>
     </div>
   );

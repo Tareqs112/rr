@@ -24,7 +24,7 @@ const TourCampaignList = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/tour-campaigns`, {
+      const response = await axios.get(`${API_BASE_URL}/tour-campaigns`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCampaigns(response.data);
@@ -41,7 +41,7 @@ const TourCampaignList = () => {
     if (window.confirm('هل أنت متأكد من رغبتك في حذف هذه الحملة السياحية؟')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`${API_BASE_URL}/api/tour-campaigns/${id}`, {
+        await axios.delete(`${API_BASE_URL}/tour-campaigns/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchCampaigns();

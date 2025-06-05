@@ -41,7 +41,7 @@ const TourGuideForm = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/tour-guides/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/tour-guides/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -86,10 +86,10 @@ const TourGuideForm = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/api/tour-guides/${id}`, formData, { headers });
+        await axios.put(`${API_BASE_URL}/tour-guides/${id}`, formData, { headers });
         setSuccess('تم تحديث بيانات المرشد السياحي بنجاح');
       } else {
-        await axios.post(`${API_BASE_URL}/api/tour-guides`, formData, { headers });
+        await axios.post(`${API_BASE_URL}/tour-guides`, formData, { headers });
         setSuccess('تم إضافة المرشد السياحي بنجاح');
         // إعادة تعيين النموذج بعد الإنشاء الناجح
         if (!isEditMode) {

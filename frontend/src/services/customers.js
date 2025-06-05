@@ -1,45 +1,56 @@
 import api from './api';
 
-// تصدير مباشر للدوال المطلوبة
+// ✅ Get All Customers
 export const getAllCustomers = async () => {
   const response = await api.get('/customers');
-  return response.data;
+  const data = response.data;
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.customers)) return data.customers;
+  return [];
 };
 
-// تصدير مباشر للدالة getCustomerById
+// ✅ Get Customer by ID
 export const getCustomerById = async (id) => {
   const response = await api.get(`/customers/${id}`);
   return response.data;
 };
 
-// تصدير مباشر للدوال الأخرى
+// ✅ Create Customer
 export const createCustomer = async (customerData) => {
   const response = await api.post('/customers', customerData);
   return response.data;
 };
 
-// تصدير مباشر للدالة updateCustomer
+// ✅ Update Customer
 export const updateCustomer = async (id, customerData) => {
   const response = await api.put(`/customers/${id}`, customerData);
   return response.data;
 };
 
+// ✅ Delete Customer
 export const deleteCustomer = async (id) => {
   const response = await api.delete(`/customers/${id}`);
   return response.data;
 };
 
+// ✅ Get Customer Bookings
 export const getCustomerBookings = async (id) => {
   const response = await api.get(`/customers/${id}/bookings`);
   return response.data;
 };
 
+// ✅ Search Customers
 export const searchCustomers = async (params) => {
   const response = await api.get('/customers/search', { params });
-  return response.data;
+  const data = response.data;
+
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.customers)) return data.customers;
+  return [];
 };
 
-// الاحتفاظ بالتصدير الافتراضي للتوافق مع الكود القديم
+// ✅ Default export for compatibility
 const customerService = {
   getAllCustomers,
   getCustomerById,
@@ -47,7 +58,7 @@ const customerService = {
   updateCustomer,
   deleteCustomer,
   getCustomerBookings,
-  searchCustomers
+  searchCustomers,
 };
 
 export default customerService;

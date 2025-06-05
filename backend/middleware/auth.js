@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const config = require('../config/auth');
-
 /**
  * وحدة التحكم الوسيطة للتحقق من المصادقة
  * تتحقق من وجود وصلاحية رمز JWT في الطلب
@@ -20,8 +19,8 @@ const authenticate = async (req, res, next) => {
     
     const token = authHeader.split(' ')[1];
     
-    // التحقق من صلاحية الرمز
-    const decoded = jwt.verify(token, config.jwtSecret);
+    // التحقق من صلاحية الرمز - إصلاح اسم المتغير من jwtSecret إلى JWT_SECRET
+    const decoded = jwt.verify(token, config.JWT_SECRET);
     
     // التحقق من وجود المستخدم في قاعدة البيانات
     const user = await User.findByPk(decoded.id);
@@ -41,6 +40,15 @@ const authenticate = async (req, res, next) => {
     // إضافة معرف المستأجر إلى الطلب إذا كان متوفرًا
     if (user.tenant_id) {
       req.tenantId = user.tenant_id;
+    }
+    
+    // التحقق من معرف المستأجر في رأس الطلب إذا كان متوفرًا
+    const headerTenantId = req.headers['x-tenant-id'];
+    if (headerTenantId && user.tenant_id && headerTenantId != user.tenant_id) {
+      return res.status(403).json({
+        success: false,
+        message: 'معرف المستأجر غير صالح'
+      });
     }
     
     // المتابعة إلى الخطوة التالية
@@ -67,7 +75,6 @@ const authenticate = async (req, res, next) => {
     });
   }
 };
-
 /**
  * وحدة التحكم الوسيطة للتحقق من صلاحيات المستخدم
  * @param {Array} roles - قائمة الأدوار المسموح لها بالوصول
@@ -94,7 +101,6 @@ const authorize = (roles = []) => {
     next();
   };
 };
-
 /**
  * وحدة التحكم الوسيطة للتحقق من صلاحيات المشرف الرئيسي
  */
@@ -118,7 +124,6 @@ const isSuperAdmin = (req, res, next) => {
   // المتابعة إلى الخطوة التالية
   next();
 };
-
 module.exports = {
   authenticate,
   authorize,

@@ -1,9 +1,8 @@
 import axios from 'axios';
+import { getToken, getTenantId, clearAuthData, setAuthError } from '../utils/authUtils';
 
-// استخدام قيمة ثابتة بدلاً من process.env لتجنب أخطاء في المتصفح
 const API_URL = 'http://localhost:5000/api';
 
-// Create axios instance with base URL
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -11,27 +10,64 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
+    const tenantId = getTenantId();
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    if (tenantId) {
+      config.headers['x-tenant-id'] = tenantId;
+    }
+    
+    console.log('API Request:', {
+      url: config.url,
+      method: config.method,
+      headers: config.headers,
+      data: config.data
+    });
+    
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('Request interceptor error:', error);
+    return Promise.reject(error);
+  }
 );
 
-// Add response interceptor to handle common errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
   (error) => {
-    // Handle 401 Unauthorized errors (token expired)
+    console.error('API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    
+    // تحسين معالجة أخطاء 401 - إضافة رسالة وتزامن حالة المصادقة
     if (error.response && error.response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      // حفظ سبب الخطأ لعرضه للمستخدم
+      const errorMessage = error.response.data?.message || 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى';
+      setAuthError(errorMessage);
+      
+      // مسح بيانات المصادقة
+      clearAuthData();
+      
+      // إعادة التوجيه إلى صفحة تسجيل الدخول
+      window.location.href = '/login?error=session_expired';
     }
+    
     return Promise.reject(error);
   }
 );

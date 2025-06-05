@@ -1,31 +1,32 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '../../services/auth';
+import { isAuthenticated, getToken } from '../../utils/authUtils';
 
-// Login user
+// تسجيل الدخول
 export const login = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
       return await authService.login(email, password);
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      return rejectWithValue(error.response?.data?.message || 'Invalid credentials');
     }
   }
 );
 
-// Register user - إضافة دالة التسجيل الناقصة
+// تسجيل مستخدم جديد
 export const register = createAsyncThunk(
   'auth/register',
-  async ({ name, email, password }, { rejectWithValue }) => {
+  async ({ username, email, password }, { rejectWithValue }) => {
     try {
-      return await authService.register(name, email, password);
+      return await authService.register(username, email, password);
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
   }
 );
 
-// Forgot password - إضافة دالة استعادة كلمة المرور الناقصة
+// استعادة كلمة المرور
 export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async ({ email }, { rejectWithValue }) => {
@@ -37,28 +38,51 @@ export const forgotPassword = createAsyncThunk(
   }
 );
 
-// Logout user
+// تسجيل الخروج
 export const logout = createAsyncThunk('auth/logout', async () => {
   authService.logout();
 });
 
-// Get user profile
+// جلب بيانات البروفايل
 export const getUserProfile = createAsyncThunk(
   'auth/getUserProfile',
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const { auth } = getState();
-      return await authService.getProfile(auth.token);
+      return await authService.getProfile();
     } catch (error) {
+      // إذا فشل الطلب، نقوم بتسجيل الخروج لتجنب الحلقة المفرغة
+      if (error.response && error.response.status === 401) {
+        authService.logout();
+      }
       return rejectWithValue(error.response?.data?.message || 'Failed to get user profile');
+    }
+  }
+);
+
+// تحقق من وجود توكن صالح
+export const checkAuth = createAsyncThunk(
+  'auth/checkAuth',
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      if (!isAuthenticated()) {
+        return { isAuthenticated: false };
+      }
+      
+      // محاولة جلب الملف الشخصي للتحقق من صلاحية التوكن
+      const result = await dispatch(getUserProfile()).unwrap();
+      return { isAuthenticated: true, user: result.user };
+    } catch (error) {
+      // إذا فشل التحقق، نقوم بتسجيل الخروج
+      authService.logout();
+      return { isAuthenticated: false };
     }
   }
 );
 
 const initialState = {
   user: null,
-  token: localStorage.getItem('token') || null,
-  isAuthenticated: !!localStorage.getItem('token'),
+  token: getToken() || null,
+  isAuthenticated: isAuthenticated(),
   isLoading: false,
   error: null,
 };
@@ -69,6 +93,12 @@ const authSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    // إضافة reducer لتحديث حالة المصادقة من localStorage
+    syncAuthState: (state) => {
+      const token = getToken();
+      state.token = token;
+      state.isAuthenticated = !!token;
     },
   },
   extraReducers: (builder) => {
@@ -132,13 +162,33 @@ const authSlice = createSlice({
       .addCase(getUserProfile.fulfilled, (state, action) => {
         state.isLoading = false;
         state.user = action.payload.user;
+        state.isAuthenticated = true; // تأكيد حالة المصادقة عند نجاح جلب الملف الشخصي
       })
       .addCase(getUserProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+        // لا نقوم بتغيير isAuthenticated هنا لأن checkAuth سيتعامل مع ذلك
+      })
+      
+      // Check Auth
+      .addCase(checkAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = action.payload.isAuthenticated;
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
       });
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, syncAuthState } = authSlice.actions;
 export default authSlice.reducer;

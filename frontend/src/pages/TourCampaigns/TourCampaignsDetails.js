@@ -24,7 +24,7 @@ const TourCampaignDetails = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/tour-campaigns/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/tour-campaigns/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -32,7 +32,7 @@ const TourCampaignDetails = () => {
       
       // جلب المشاركين في الحملة (يمكن تنفيذ هذا في الخلفية لاحقاً)
       try {
-        const participantsResponse = await axios.get(`${API_BASE_URL}/api/tour-campaigns/${id}/participants`, {
+        const participantsResponse = await axios.get(`${API_BASE_URL}/tour-campaigns/${id}/participants`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setParticipants(participantsResponse.data);

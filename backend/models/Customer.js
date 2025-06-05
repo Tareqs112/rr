@@ -60,5 +60,12 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true
   });
 
+  Customer.associate = (models) => {
+  Customer.belongsTo(models.Company, {
+    foreignKey: 'company_id',
+    as: 'company'
+  });
+};
+
   return Customer;
 };

@@ -1,0 +1,168 @@
+.customers-list {
+  padding: 1rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.add-button {
+  background-color: #38a169;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-button:hover {
+  background-color: #2f855a;
+}
+
+.filters {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.search-box input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.filter-box {
+  display: flex;
+  align-items: center;
+}
+
+.filter-box label {
+  margin-left: 0.5rem;
+}
+
+.filter-box select {
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.table-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.customers-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customers-table th,
+.customers-table td {
+  padding: 0.75rem 1rem;
+  text-align: right;
+}
+
+.customers-table th {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.customers-table tr:not(:last-child) {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.customers-table tr:hover {
+  background-color: #f7fafc;
+}
+
+.customer-status {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge.vip {
+  background-color: #fed7e2;
+  color: #97266d;
+}
+
+.badge.repeat {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.balance-positive {
+  color: #38a169;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-button {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.action-button.edit {
+  background-color: #4299e1;
+  color: white;
+}
+
+.action-button.view {
+  background-color: #805ad5;
+  color: white;
+}
+
+.action-button.delete {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.action-button:hover {
+  opacity: 0.9;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.2rem;
+  color: #4a5568;
+}

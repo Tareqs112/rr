@@ -41,7 +41,7 @@ const TourCampaignForm = () => {
   const fetchCompanies = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/companies`, {
+      const response = await axios.get(`${API_BASE_URL}/companies`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCompanies(response.data);
@@ -55,7 +55,7 @@ const TourCampaignForm = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_BASE_URL}/api/tour-campaigns/${id}`, {
+      const response = await axios.get(`${API_BASE_URL}/tour-campaigns/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -104,10 +104,10 @@ const TourCampaignForm = () => {
       const headers = { Authorization: `Bearer ${token}` };
       
       if (isEditMode) {
-        await axios.put(`${API_BASE_URL}/api/tour-campaigns/${id}`, formData, { headers });
+        await axios.put(`${API_BASE_URL}/tour-campaigns/${id}`, formData, { headers });
         setSuccess('تم تحديث الحملة السياحية بنجاح');
       } else {
-        await axios.post(`${API_BASE_URL}/api/tour-campaigns`, formData, { headers });
+        await axios.post(`${API_BASE_URL}/tour-campaigns`, formData, { headers });
         setSuccess('تم إنشاء الحملة السياحية بنجاح');
         // إعادة تعيين النموذج بعد الإنشاء الناجح
         if (!isEditMode) {
